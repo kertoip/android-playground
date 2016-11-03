@@ -1,5 +1,6 @@
 package pl.edu.pjwstk.s7367.smb1.shoppinglist;
 
+import android.app.DialogFragment;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -18,7 +19,7 @@ import java.util.List;
 import pl.edu.pjwstk.s7367.smb1.shoppinglist.model.Product;
 import pl.edu.pjwstk.s7367.smb1.shoppinglist.model.ProductRowAdapter;
 
-public class ProductListActivity extends AppCompatActivity {
+public class ProductListActivity extends AppCompatActivity implements EditDialog.ProductEditor {
 
     private ProductRowAdapter productAdapter;
     private ArrayList<Product> productList;
@@ -36,6 +37,7 @@ public class ProductListActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 productAdapter.add(new Product("Produkt", 1));
+                new EditDialog().show(getFragmentManager(), "edit");
             }
         });
 
@@ -76,5 +78,12 @@ public class ProductListActivity extends AppCompatActivity {
                 return super.onContextItemSelected(item);
         }
         return super.onContextItemSelected(item);
+    }
+
+
+    @Override
+    public void addProductToList(Product p) {
+        productList.add(p);
+        productAdapter.notifyDataSetChanged();
     }
 }
