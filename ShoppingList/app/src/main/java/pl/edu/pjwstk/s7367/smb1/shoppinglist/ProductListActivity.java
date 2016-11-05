@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import pl.edu.pjwstk.s7367.smb1.shoppinglist.data.DbAdapter;
 import pl.edu.pjwstk.s7367.smb1.shoppinglist.model.Product;
@@ -21,6 +22,7 @@ public class ProductListActivity extends AppCompatActivity implements EditDialog
     private ProductRowAdapter productAdapter;
     private ListView listView;
 
+    private DbAdapter dbAdapter;
     private Cursor productCursor;
 
     @Override
@@ -40,12 +42,19 @@ public class ProductListActivity extends AppCompatActivity implements EditDialog
 
         listView = (ListView) findViewById(R.id.productList);
 
-        productCursor = new DbAdapter(this).getAllProducts();
+        dbAdapter = new DbAdapter(this);
+        productCursor = dbAdapter.getAllProducts();
         productAdapter = new ProductRowAdapter(this, productCursor);
 
         listView.setAdapter(productAdapter);
 
         registerForContextMenu(listView);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        dbAdapter.close();
     }
 
     @Override
@@ -65,6 +74,7 @@ public class ProductListActivity extends AppCompatActivity implements EditDialog
                 break;
             case R.id.deleteProduct:
                 productAdapter.removeProduct(getPositionFromMenuInfo(item.getMenuInfo()));
+                Toast.makeText(this, R.string.product_removed, Toast.LENGTH_SHORT).show();
                 break;
             default:
                 return super.onContextItemSelected(item);
@@ -88,7 +98,7 @@ public class ProductListActivity extends AppCompatActivity implements EditDialog
     }
 
     @Override
-    public void updatePorduct(long id, String name) {
+    public void updateProduct(long id, String name) {
         productAdapter.updateProduct(id, name);
     }
 }

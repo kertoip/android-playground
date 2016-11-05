@@ -16,7 +16,7 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:text="Wielkość czcionki"
+            android:text="@string/font_size"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/fontSizeTxt" />
@@ -28,9 +28,10 @@
             android:id="@+id/fontSizeSeekBar" />
 
         <ToggleButton
-            android:text="darkMode"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/darkModeToggle" />
+            android:id="@+id/darkModeToggle"
+            android:textOff="@string/light_mode"
+            android:textOn="@string/dark_mode"/>
     </LinearLayout>
 </RelativeLayout>

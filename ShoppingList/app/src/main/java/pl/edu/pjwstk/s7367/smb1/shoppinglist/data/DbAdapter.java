@@ -19,9 +19,9 @@ import static java.lang.String.format;
 public class DbAdapter {
     private static final String DEBUG_TAG = DbAdapter.class.toString();
 
-    private static final int DB_VERSION = 1;
-    private static final String DB_NAME = "ShoppingList.db";
-    private static final String DB_PRODUCT_TABLE = "Product";
+    static final int DB_VERSION = 1;
+    static final String DB_NAME = "ShoppingList.db";
+    static final String DB_PRODUCT_TABLE = "Product";
 
     public static final String KEY_ID = "_id";
     public static final String ID_OPTIONS = "INTEGER PRIMARY KEY AUTOINCREMENT";
@@ -53,7 +53,7 @@ public class DbAdapter {
     }
 
     public DbAdapter open() {
-        dbHelper = new DbHelper(context, DB_NAME, null, DB_VERSION);
+        dbHelper = new DbHelper(context);
         try {
             db = dbHelper.getWritableDatabase();
         } catch (SQLException e) {
@@ -104,27 +104,4 @@ public class DbAdapter {
         return p;
     }
 
-    private class DbHelper extends SQLiteOpenHelper {
-
-        public DbHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
-            super(context, name, factory, version);
-        }
-
-        @Override
-        public void onCreate(SQLiteDatabase db) {
-            Log.d(DEBUG_TAG, format("Creating table %s ver. %s", DB_PRODUCT_TABLE, DB_VERSION));
-            db.execSQL(DB_CREATE_PRODUCT_TABLE);
-        }
-
-        @Override
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            Log.d(DEBUG_TAG, format("Updating table %s from ver. %s to ver. %s", DB_PRODUCT_TABLE, oldVersion, newVersion));
-
-            db.execSQL(DB_DROP_PRODUCT_TABEL);
-
-            Log.d(DEBUG_TAG, "All previous data is deleted!");
-
-            onCreate(db);
-        }
-    }
 }

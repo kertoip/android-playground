@@ -26,7 +26,7 @@ public class EditDialog extends DialogFragment {
 
     public interface ProductEditor {
         void addProductToList(Product p);
-        void updatePorduct(long id, String name);
+        void updateProduct(long id, String name);
     }
 
     public static EditDialog newInstance(final long productId, final String productName) {
@@ -58,7 +58,7 @@ public class EditDialog extends DialogFragment {
                     public void onClick(DialogInterface dialog, int which) {
                         if (getActivity() instanceof ProductEditor) {
                             if (isEditMode()) {
-                                ((ProductEditor) getActivity()).updatePorduct(getProductIdFromArgs(), productName.getText().toString());
+                                ((ProductEditor) getActivity()).updateProduct(getProductIdFromArgs(), productName.getText().toString());
                                 Log.d(DEBUG_TAG, "Product has been edited!");
                             } else {
                                 ((ProductEditor) getActivity()).addProductToList(new Product(productName.getText().toString()));
