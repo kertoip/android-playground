@@ -74,4 +74,12 @@
     <string name="pref_ringtone_silent">Silent</string>
 
     <string name="pref_title_vibrate">Vibrate</string>
+
+    <!--manually added-->
+    <string name="edit_dialog_title">Dodawanie nowego produktu</string>
+    <string name="edit_dialog_hint">Nazwa produktu</string>
+    <string name="edit_dialog_cancel">Anuluj</string>
+    <string name="edit_dialog_confirm">OK!</string>
+    <string name="edit">Item</string>
+    <string name="delete">Usuń</string>
 </resources>

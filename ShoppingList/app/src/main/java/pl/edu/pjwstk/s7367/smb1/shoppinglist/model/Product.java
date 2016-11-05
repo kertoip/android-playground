@@ -6,22 +6,35 @@ package pl.edu.pjwstk.s7367.smb1.shoppinglist.model;
 
 public class Product {
 
-    private final String name;
-    private final int quantity;
+    private long id;
+    private String name;
     private boolean isChecked;
 
-    public Product(String name, int quantity) {
+    public Product(String name) {
         this.name = name;
-        this.quantity = quantity;
         this.isChecked = false;
+    }
+
+    public Product(long id, String name, boolean isChecked) {
+        this.id = id;
+        this.name = name;
+        this.isChecked = isChecked;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getName() {
         return name;
     }
 
-    public int getQuantity() {
-        return quantity;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public boolean isChecked() {
