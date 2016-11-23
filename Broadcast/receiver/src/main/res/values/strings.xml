@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Receiver</string>
+    <string name="notification_title">SMB2 notification</string>
 </resources>
