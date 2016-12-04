@@ -16,6 +16,7 @@ import java.util.List;
 
 import pl.edu.pjwstk.s7367.smb1.shoppinglist.OptionsActivity;
 import pl.edu.pjwstk.s7367.smb1.shoppinglist.R;
+import pl.edu.pjwstk.s7367.smb1.shoppinglist.cloud.UpdateProductAsyncTask;
 import pl.edu.pjwstk.s7367.smb1.shoppinglist.data.DbAdapter;
 
 /**

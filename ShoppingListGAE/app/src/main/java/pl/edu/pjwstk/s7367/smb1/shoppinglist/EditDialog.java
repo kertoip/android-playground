@@ -20,20 +20,23 @@ public class EditDialog extends DialogFragment {
     private static final String DEBUG_TAG = EditDialog.class.toString();
 
     private static final String KEY_PRODUCT_ID = "KEY_PRODUCT_ID";
+    private static final String KEY_PRODUCT_POSITION = "KEY_PRODUCT_POSITION";
     private static final String KEY_PRODUCT_NAME = "KEY_PRODUCT_NAME";
     private static final Long NO_PRODUCT_ID = -1L;
     private static final String NO_PRODUCT_NAME = "";
 
     public interface ProductEditor {
-        void addProductToList(Product p);
+        void addProductToList(pl.edy.pjwstk.s7367.smb3.shoppinglist.gae.productApi.model.Product p);
         void updateProduct(long id, String name);
+        void updateProduct(int position, String newName);
     }
 
-    public static EditDialog newInstance(final long productId, final String productName) {
+    public static EditDialog newInstance(final long productId, final int position, final String productName) {
 
         Bundle args = new Bundle();
         args.putLong(KEY_PRODUCT_ID, productId);
         args.putString(KEY_PRODUCT_NAME, productName);
+        args.putInt(KEY_PRODUCT_POSITION, position);
 
         EditDialog fragment = new EditDialog();
         fragment.setArguments(args);
@@ -58,10 +61,14 @@ public class EditDialog extends DialogFragment {
                     public void onClick(DialogInterface dialog, int which) {
                         if (getActivity() instanceof ProductEditor) {
                             if (isEditMode()) {
-                                ((ProductEditor) getActivity()).updateProduct(getProductIdFromArgs(), productName.getText().toString());
+                                ((ProductEditor) getActivity()).updateProduct(getProductPosition(), productName.getText().toString());
+//                                ((ProductEditor) getActivity()).updateProduct(getProductIdFromArgs(), productName.getText().toString());
                                 Log.d(DEBUG_TAG, "Product has been edited!");
                             } else {
-                                ((ProductEditor) getActivity()).addProductToList(new Product(productName.getText().toString()));
+                                pl.edy.pjwstk.s7367.smb3.shoppinglist.gae.productApi.model.Product p = new pl.edy.pjwstk.s7367.smb3.shoppinglist.gae.productApi.model.Product();
+                                p.setName(productName.getText().toString());
+                                p.setChecked(Boolean.FALSE);
+                                ((ProductEditor) getActivity()).addProductToList(p);
                                 Log.d(DEBUG_TAG, "New product added");
                             }
                         } else {
@@ -96,6 +103,10 @@ public class EditDialog extends DialogFragment {
 
     private long getProductIdFromArgs() {
         return getArguments().getLong(KEY_PRODUCT_ID);
+    }
+
+    private int getProductPosition() {
+        return getArguments().getInt(KEY_PRODUCT_POSITION);
     }
 
 }

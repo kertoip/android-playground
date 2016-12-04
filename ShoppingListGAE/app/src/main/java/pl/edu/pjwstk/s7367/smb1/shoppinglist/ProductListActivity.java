@@ -13,17 +13,25 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.common.base.Optional;
+
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import pl.edu.pjwstk.s7367.smb1.shoppinglist.cloud.AddProductAsyncTask;
+import pl.edu.pjwstk.s7367.smb1.shoppinglist.cloud.DeleteProductAsyncTask;
 import pl.edu.pjwstk.s7367.smb1.shoppinglist.cloud.GetProductsAsyncTask;
+import pl.edu.pjwstk.s7367.smb1.shoppinglist.cloud.ProductRowAdapterGAE;
+import pl.edu.pjwstk.s7367.smb1.shoppinglist.cloud.UpdateProductAsyncTask;
 import pl.edu.pjwstk.s7367.smb1.shoppinglist.data.DbAdapter;
 import pl.edu.pjwstk.s7367.smb1.shoppinglist.model.Product;
 import pl.edu.pjwstk.s7367.smb1.shoppinglist.model.ProductRowAdapter;
+import pl.edy.pjwstk.s7367.smb3.shoppinglist.gae.productApi.ProductApi;
 
 public class ProductListActivity extends AppCompatActivity implements EditDialog.ProductEditor {
 
     private ProductRowAdapter productAdapter;
+    private ProductRowAdapterGAE productRowAdapterGAE;
     private ListView listView;
 
     private DbAdapter dbAdapter;
@@ -50,8 +58,8 @@ public class ProductListActivity extends AppCompatActivity implements EditDialog
         productCursor = dbAdapter.getAllProducts();
 
         try {
-            List<pl.edy.pjwstk.s7367.smb3.shoppinglist.gae.productApi.model.Product> gaeList = new GetProductsAsyncTask().execute().get();
-            Toast.makeText(this, gaeList.size(), Toast.LENGTH_LONG ).show();
+            List<pl.edy.pjwstk.s7367.smb3.shoppinglist.gae.productApi.model.Product> gaeList = new GetProductsAsyncTask().execute().get(); //todo pk wywalic row adpater z async taska?
+            productRowAdapterGAE = new ProductRowAdapterGAE(this, gaeList);
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -60,7 +68,8 @@ public class ProductListActivity extends AppCompatActivity implements EditDialog
 
         productAdapter = new ProductRowAdapter(this, productCursor);
 
-        listView.setAdapter(productAdapter);
+//        listView.setAdapter(productAdapter);
+        listView.setAdapter(productRowAdapterGAE);
 
         registerForContextMenu(listView);
     }
@@ -74,7 +83,7 @@ public class ProductListActivity extends AppCompatActivity implements EditDialog
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        menu.setHeaderTitle(productAdapter.getNameByPosition(getPositionFromMenuInfo(menuInfo)));
+        menu.setHeaderTitle(productRowAdapterGAE.getItem(getPositionFromMenuInfo(menuInfo)).getName());
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.product_context_menu, menu);
 
@@ -87,7 +96,9 @@ public class ProductListActivity extends AppCompatActivity implements EditDialog
                 getEditDialog(item.getMenuInfo()).show(getFragmentManager(), getLocalClassName());
                 break;
             case R.id.deleteProduct:
-                productAdapter.removeProduct(getPositionFromMenuInfo(item.getMenuInfo()));
+                pl.edy.pjwstk.s7367.smb3.shoppinglist.gae.productApi.model.Product p = productRowAdapterGAE.getItem(getPositionFromMenuInfo(item.getMenuInfo()));
+                new DeleteProductAsyncTask().execute(p);
+                productRowAdapterGAE.remove(p);
                 Toast.makeText(this, R.string.product_removed, Toast.LENGTH_SHORT).show();
                 break;
             default:
@@ -101,18 +112,40 @@ public class ProductListActivity extends AppCompatActivity implements EditDialog
     }
 
     private EditDialog getEditDialog(ContextMenu.ContextMenuInfo menuInfo) {
-        int position = getPositionFromMenuInfo(menuInfo);
-        return EditDialog.newInstance(productAdapter.getItemId(position), productAdapter.getNameByPosition(position));
+        pl.edy.pjwstk.s7367.smb3.shoppinglist.gae.productApi.model.Product product
+                = productRowAdapterGAE.getItem(getPositionFromMenuInfo(menuInfo));
+        return EditDialog.newInstance(product.getId(), getPositionFromMenuInfo(menuInfo), product.getName());
     }
 
 
     @Override
-    public void addProductToList(Product p) {
-        productAdapter.addProduct(p.getName());
+    public void addProductToList(pl.edy.pjwstk.s7367.smb3.shoppinglist.gae.productApi.model.Product p) {
+        try {
+            Optional<pl.edy.pjwstk.s7367.smb3.shoppinglist.gae.productApi.model.Product> added = new AddProductAsyncTask().execute(p).get();
+            if (added.isPresent()) {
+                productRowAdapterGAE.add(added.get());
+                Toast.makeText(this, "Product has been added!", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(this, "Product could not be added!", Toast.LENGTH_LONG).show();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void updateProduct(long id, String name) {
         productAdapter.updateProduct(id, name);
+    }
+
+    @Override
+    public void updateProduct(int position, String newName) {
+        pl.edy.pjwstk.s7367.smb3.shoppinglist.gae.productApi.model.Product p = productRowAdapterGAE.getItem(position);
+        String oldName = p.getName();
+        p.setName(newName);
+        new UpdateProductAsyncTask().execute(p);
+
     }
 }
