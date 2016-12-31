@@ -18,7 +18,7 @@ import java.util.TreeSet;
 
 public class OptionsActivity extends AppCompatActivity {
 
-    public final static String SHARED_PREF_FONT_SIZE = "SHARED_PREF_FONT_SIZE"; //TODO to R.string??
+    public final static String SHARED_PREF_FONT_SIZE = "SHARED_PREF_FONT_SIZE";
     public final static String SHARED_PREF_IS_DARK_MODE = "SHARED_PREF_IS_DARK_MODE";
     public final static int DEFAULT_FONT_SIZE = 14;
     public final static String SHARED_PREF_NAME = "SHARED_PREF_NAME";
@@ -38,7 +38,6 @@ public class OptionsActivity extends AppCompatActivity {
 
     ToggleButton isDarkMode;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,13 +46,12 @@ public class OptionsActivity extends AppCompatActivity {
         fontSize = getSharedPreferences().getInt(SHARED_PREF_FONT_SIZE, DEFAULT_FONT_SIZE);
 
         fontSeekBar = (SeekBar) findViewById(R.id.fontSizeSeekBar);
-        fontSeekBar.setProgress(AVAILABLE_FONT_SIZES.get(AVAILABLE_FONT_SIZES.indexOf(fontSize)));
+        fontSeekBar.setProgress(AVAILABLE_FONT_SIZES.indexOf(fontSize));
         fontSeekBar.setMax(AVAILABLE_FONT_SIZES.size()-1);
         fontSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                System.out.println("progress: " + progress);
                 fontSize = AVAILABLE_FONT_SIZES.get(progress);
             }
 
@@ -68,7 +66,7 @@ public class OptionsActivity extends AppCompatActivity {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putInt(SHARED_PREF_FONT_SIZE, fontSize);
                 if (editor.commit()) {
-                    Toast.makeText(getApplicationContext(), "ustawiono rozmiar trzcionki:" + fontSize, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "ustawiono rozmiar czcionki:" + fontSize, Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(getApplicationContext(), "Błąd!!!!:" + fontSize, Toast.LENGTH_LONG).show();
                 };

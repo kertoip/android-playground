@@ -74,4 +74,19 @@
     <string name="pref_ringtone_silent">Silent</string>
 
     <string name="pref_title_vibrate">Vibrate</string>
+
+    <!--manually added-->
+    <string name="edit_dialog_title">Dodawanie nowego produktu</string>
+    <string name="edit_dialog_hint">Nazwa produktu</string>
+    <string name="edit_dialog_cancel">Anuluj</string>
+    <string name="edit_dialog_confirm">OK!</string>
+    <string name="edit">Edytuj</string>
+    <string name="delete">Usuń</string>
+
+    <string name="product_removed">Produkt został usunięty</string>
+    <string name="product_edited">Edycja zakończona</string>
+    <string name="product_edition_canceled">Edycja zakończona</string>
+    <string name="font_size">Wielkość czcionki</string>
+    <string name="light_mode">Jasny</string>
+    <string name="dark_mode">Ciemny</string>
 </resources>

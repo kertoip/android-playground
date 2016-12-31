@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Sender</string>
+    <string name="action_settings">Settings</string>
+    <string name="permission_label">My permission for SMB2</string>
+    <string name="permission_group_label">SMB2 permissions</string>
+    <string name="headerLabel">Sender</string>
+    <string name="inputMessageHint">Wpisz wiadomość</string>
+</resources>

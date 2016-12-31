@@ -1,6 +1,6 @@
 package pl.edu.pjwstk.s7367.smb1.shoppinglist;
 
-import android.app.DialogFragment;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -11,19 +11,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
+import pl.edu.pjwstk.s7367.smb1.shoppinglist.data.DbAdapter;
 import pl.edu.pjwstk.s7367.smb1.shoppinglist.model.Product;
 import pl.edu.pjwstk.s7367.smb1.shoppinglist.model.ProductRowAdapter;
 
 public class ProductListActivity extends AppCompatActivity implements EditDialog.ProductEditor {
 
     private ProductRowAdapter productAdapter;
-    private ArrayList<Product> productList;
     private ListView listView;
+
+    private DbAdapter dbAdapter;
+    private Cursor productCursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,18 +36,15 @@ public class ProductListActivity extends AppCompatActivity implements EditDialog
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                productAdapter.add(new Product("Produkt", 1));
-                new EditDialog().show(getFragmentManager(), "edit");
+                new EditDialog().show(getFragmentManager(), getLocalClassName());
             }
         });
 
         listView = (ListView) findViewById(R.id.productList);
 
-        productList = new ArrayList<>();
-        productList.add(new Product("mleko", 1));
-        productList.add(new Product("chleb", 2));
-
-        productAdapter = new ProductRowAdapter(this, R.layout.product_row, productList);
+        dbAdapter = new DbAdapter(this);
+        productCursor = dbAdapter.getAllProducts();
+        productAdapter = new ProductRowAdapter(this, productCursor);
 
         listView.setAdapter(productAdapter);
 
@@ -55,9 +52,15 @@ public class ProductListActivity extends AppCompatActivity implements EditDialog
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        dbAdapter.close();
+    }
+
+    @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        menu.setHeaderTitle(productAdapter.getItem(((AdapterView.AdapterContextMenuInfo) menuInfo).position).getName());
+        menu.setHeaderTitle(productAdapter.getNameByPosition(getPositionFromMenuInfo(menuInfo)));
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.product_context_menu, menu);
 
@@ -65,14 +68,13 @@ public class ProductListActivity extends AppCompatActivity implements EditDialog
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo infor = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         switch (item.getItemId()) {
             case R.id.editProduct:
-                System.out.println("Editing...");
+                getEditDialog(item.getMenuInfo()).show(getFragmentManager(), getLocalClassName());
                 break;
             case R.id.deleteProduct:
-                productList.remove(((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).position);
-                productAdapter.notifyDataSetChanged();
+                productAdapter.removeProduct(getPositionFromMenuInfo(item.getMenuInfo()));
+                Toast.makeText(this, R.string.product_removed, Toast.LENGTH_SHORT).show();
                 break;
             default:
                 return super.onContextItemSelected(item);
@@ -80,10 +82,23 @@ public class ProductListActivity extends AppCompatActivity implements EditDialog
         return super.onContextItemSelected(item);
     }
 
+    private int getPositionFromMenuInfo(ContextMenu.ContextMenuInfo menuInfo) {
+        return ((AdapterView.AdapterContextMenuInfo) menuInfo).position;
+    }
+
+    private EditDialog getEditDialog(ContextMenu.ContextMenuInfo menuInfo) {
+        int position = getPositionFromMenuInfo(menuInfo);
+        return EditDialog.newInstance(productAdapter.getItemId(position), productAdapter.getNameByPosition(position));
+    }
+
 
     @Override
     public void addProductToList(Product p) {
-        productList.add(p);
-        productAdapter.notifyDataSetChanged();
+        productAdapter.addProduct(p.getName());
+    }
+
+    @Override
+    public void updateProduct(long id, String name) {
+        productAdapter.updateProduct(id, name);
     }
 }
